@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seattle Dojo - Monthly Newsletter & Club Management</title>
+  <style>
+    :root {
+      --blue: #1d4ed8;
+      --blue-dark: #1e3a8a;
+      --blue-light: #3b82f6;
+      --blue-50: #eff6ff;
+      --blue-100: #dbeafe;
+      --red: #dc2626;
+      --green: #059669;
+      --gold: #d97706;
+      --bg: #f8fafc;
+      --white: #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--gray-800);
+      line-height: 1.6;
+      background: var(--white);
+    }
+
+    /* ── TOP NAVBAR ── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--gray-900);
+      flex-shrink: 0;
+    }
+
+    .nav-brand .logo-box {
+      width: 38px; height: 38px;
+      background: var(--blue);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    .nav-brand .brand-text h1 { font-size: 1rem; font-weight: 700; line-height: 1.2; }
+    .nav-brand .brand-text p { font-size: 0.65rem; color: var(--gray-500); line-height: 1; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.1rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    .nav-link {
+      padding: 0.45rem 0.7rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover { color: var(--gray-900); background: var(--gray-100); }
+    .nav-link.active { color: var(--blue); font-weight: 600; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .nav-social {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .nav-social a {
+      color: var(--gray-400);
+      font-size: 1.1rem;
+      transition: color 0.15s;
+      text-decoration: none;
+    }
+
+    .nav-social a:hover { color: var(--gray-700); }
+
+    .btn-login {
+      background: var(--blue);
+      color: white;
+      border: none;
+      padding: 0.45rem 1.1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-login:hover { background: var(--blue-dark); }
+
+    /* Mobile hamburger */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-700);
+      padding: 0.25rem;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.5);
+    }
+
+    .mobile-menu.show { display: block; }
+
+    .mobile-menu-content {
+      background: white;
+      width: 280px;
+      height: 100%;
+      padding: 1.5rem;
+      overflow-y: auto;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+    .mobile-menu .nav-link {
+      display: block;
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 1rem;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+      background: linear-gradient(135deg, rgba(30,58,138,0.85), rgba(29,78,216,0.75)),
+                  url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%231e3a8a" width="1200" height="600"/><circle cx="200" cy="300" r="150" fill="%23ffffff10"/><circle cx="900" cy="200" r="200" fill="%23ffffff08"/><circle cx="600" cy="500" r="180" fill="%23ffffff05"/></svg>');
+      background-size: cover;
+      background-position: center;
+      padding: 3rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+
+    .btn-blue { background: var(--blue); color: white; }
+    .btn-blue:hover { background: var(--blue-dark); }
+    .btn-white { background: white; color: var(--gray-800); }
+    .btn-white:hover { background: var(--gray-100); }
+    .btn-outline { background: transparent; color: var(--blue); border: 2px solid var(--blue); }
+    .btn-outline:hover { background: var(--blue-50); }
+    .btn-ghost { background: transparent; color: var(--gray-600); }
+    .btn-ghost:hover { background: var(--gray-100); }
+    .btn-green { background: var(--green); color: white; }
+    .btn-green:hover { background: #047857; }
+    .btn-red { background: var(--red); color: white; }
+    .btn-red:hover { background: #b91c1c; }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.85rem; }
+    .btn-lg { padding: 0.85rem 2rem; font-size: 1.05rem; }
+
+    /* ── SECTION LAYOUTS ── */
+    .section {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-gray { background: var(--gray-50); }
+    .section-blue { background: var(--blue-50); }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-header h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-header p {
+      color: var(--gray-500);
+      font-size: 1.05rem;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      padding: 2.5rem 2rem 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 0.35rem;
+    }
+
+    .page-header p {
+      color: var(--gray-500);
+      font-size: 1rem;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      transition: all 0.15s;
+    }
+
+    .card:hover { box-shadow: var(--shadow-md); }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .feature-card .f-icon {
+      width: 56px; height: 56px;
+      background: var(--blue-50);
+      color: var(--blue);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--gray-900);
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: var(--gray-50);
+    }
+
+    .cta-section h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-section p {
+      color: var(--gray-500);
+      font-size: 1.05rem;
+      max-width: 550px;
+      margin: 0 auto 1.75rem;
+    }
+
+    .cta-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── PRICING CARDS ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 2rem;
+      background: white;
+      transition: all 0.15s;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--blue);
+      box-shadow: var(--shadow-md);
+    }
+
+    .pricing-card .p-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.25rem;
+    }
+
+    .pricing-card h3 { font-size: 1.3rem; font-weight: 700; }
+    .pricing-card .p-sub { color: var(--gray-500); font-size: 0.85rem; margin-bottom: 1.25rem; }
+
+    .pricing-card .p-icon {
+      width: 40px; height: 40px;
+      background: var(--blue-50);
+      color: var(--blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .pricing-card .price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--gray-900);
+    }
+
+    .pricing-card .price span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--gray-500);
+    }
+
+    .pricing-card .p-features {
+      list-style: none;
+      margin: 1.25rem 0 1.5rem;
+    }
+
+    .pricing-card .p-features li {
+      padding: 0.35rem 0;
+      font-size: 0.9rem;
+      color: var(--gray-600);
+    }
+
+    .pricing-card .p-features li::before {
+      content: '✓ ';
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .pricing-card .btn { width: 100%; justify-content: center; }
+
+    /* ── DONATE ── */
+    .donate-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .amount-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .amount-btn {
+      padding: 0.75rem;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--gray-700);
+    }
+
+    .amount-btn:hover, .amount-btn.selected {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-50);
+    }
+
+    .impact-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+    }
+
+    .impact-item .i-icon {
+      width: 40px; height: 40px;
+      background: var(--blue-50);
+      color: var(--blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .impact-item h4 { font-size: 0.95rem; font-weight: 600; }
+    .impact-item p { font-size: 0.85rem; color: var(--gray-500); }
+
+    /* ── SCHEDULE TABLE ── */
+    .schedule-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+    }
+
+    .schedule-table { width: 100%; border-collapse: collapse; }
+    .schedule-table th {
+      background: var(--blue);
+      color: white;
+      padding: 0.75rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .schedule-table td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.85rem;
+      vertical-align: top;
+    }
+
+    .schedule-table tr:hover td { background: var(--blue-50); }
+
+    .class-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 0.4rem;
+    }
+
+    .dot-youth { background: var(--green); }
+    .dot-senior { background: var(--blue); }
+    .dot-comp { background: var(--gold); }
+    .dot-kata { background: #a855f7; }
+
+    /* ── RESOURCE CARDS ── */
+    .resource-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      background: white;
+      transition: all 0.15s;
+    }
+
+    .resource-card:hover { border-color: var(--blue); box-shadow: var(--shadow); }
+    .resource-card h3 { font-size: 1.05rem; font-weight: 600; }
+    .resource-card p { font-size: 0.85rem; color: var(--gray-500); }
+
+    /* ── FORMS ── */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: var(--gray-700);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+      background: white;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+    }
+
+    textarea.form-control { resize: vertical; min-height: 90px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* ── TABLES ── */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+    th {
+      background: var(--gray-50);
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--gray-500);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--gray-200);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+
+    tr:hover td { background: var(--blue-50); }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-yellow { background: #fef3c7; color: #92400e; }
+
+    .belt { display: inline-flex; align-items: center; gap: 0.35rem; }
+    .belt-dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #ccc; }
+    .belt-white { background: #fff; }
+    .belt-yellow { background: #fbbf24; border-color: #f59e0b; }
+    .belt-orange { background: #f97316; border-color: #ea580c; }
+    .belt-green { background: #22c55e; border-color: #16a34a; }
+    .belt-blue { background: #3b82f6; border-color: #2563eb; }
+    .belt-purple { background: #a855f7; border-color: #9333ea; }
+    .belt-brown { background: #92400e; border-color: #78350f; }
+    .belt-black { background: #1f2937; border-color: #000; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .modal-header h3 { font-size: 1.15rem; color: var(--gray-900); }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-400); }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--gray-200); display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+    /* ── HISTORY TABS ── */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--gray-200);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .tab:hover { color: var(--gray-700); }
+    .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: var(--gray-50);
+      border-radius: var(--radius);
+    }
+
+    .empty-state .e-icon { font-size: 3rem; margin-bottom: 0.75rem; color: var(--gray-400); }
+    .empty-state h3 { font-size: 1.1rem; color: var(--gray-700); margin-bottom: 0.35rem; }
+    .empty-state p { color: var(--gray-500); font-size: 0.9rem; }
+
+    /* ── ALERT BOX ── */
+    .alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--blue);
+      border-radius: var(--radius);
+      background: var(--blue-50);
+      margin-bottom: 1.5rem;
+    }
+
+    .alert .a-icon {
+      width: 36px; height: 36px;
+      background: var(--blue);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alert h4 { font-size: 0.95rem; font-weight: 600; }
+    .alert p { font-size: 0.85rem; color: var(--gray-600); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--gray-800);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      font-size: 0.9rem;
+      z-index: 1000;
+      animation: toastIn 0.3s ease;
+    }
+
+    .toast.success { background: var(--green); }
+    .toast.error { background: var(--red); }
+
+    @keyframes toastIn { from { transform: translateY(1rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* ── ADMIN LAYOUT ── */
+    .admin-topbar {
+      background: var(--gray-900);
+      color: white;
+      padding: 0.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 2rem;
+    }
+
+    .admin-tab {
+      padding: 0.85rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .admin-tab:hover { color: var(--gray-700); }
+    .admin-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+    .admin-content { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      border-left: 4px solid var(--blue);
+    }
+
+    .stat-card.accent { border-left-color: var(--green); }
+    .stat-card.warn { border-left-color: var(--gold); }
+
+    .stat-card .s-value { font-size: 1.8rem; font-weight: 800; color: var(--gray-900); }
+    .stat-card .s-label { font-size: 0.8rem; color: var(--gray-500); }
+
+    .search-bar {
+      position: relative;
+      max-width: 300px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 0.5rem 0.85rem 0.5rem 2.25rem;
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+    }
+
+    .search-bar input:focus { outline: none; border-color: var(--blue); }
+    .search-bar::before { content: '🔍'; position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); font-size: 0.85rem; }
+
+    /* ── PRINT ── */
+    @media print {
+      .navbar, .admin-topbar, .admin-tabs, .btn, .modal-overlay, .toast, .hamburger, .mobile-menu { display: none !important; }
+      .page { display: none !important; }
+      .page.print-target { display: block !important; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links, .nav-right { display: none; }
+      .hamburger { display: block; }
+      .hero h1 { font-size: 2rem; }
+      .hero { min-height: 380px; padding: 2rem 1rem; }
+      .section, .page-header, .admin-content { padding: 1.5rem 1rem; }
+      .donate-grid, .schedule-layout, .form-row { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .amount-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* ── UTILITIES ── */
+    .flex { display: flex; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .gap-1 { gap: 0.5rem; }
+    .gap-2 { gap: 1rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .mb-3 { margin-bottom: 1.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .text-center { text-align: center; }
+
+    /* ── SWAG CARDS ── */
+    .swag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .swag-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: white;
+      transition: all 0.15s;
+    }
+
+    .swag-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+    .swag-img {
+      height: 200px;
+      background: var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+
+    .swag-info {
+      padding: 1.25rem;
+    }
+
+    .swag-info h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+    .swag-info .s-price { font-size: 1.2rem; font-weight: 700; color: var(--blue); margin-bottom: 0.75rem; }
+
+    /* ── JOIN FORM ── */
+    .join-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .info-box {
+      background: var(--blue-50);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .info-box h3 { color: var(--blue-dark); margin-bottom: 0.75rem; }
+    .info-box li { padding: 0.4rem 0; font-size: 0.9rem; color: var(--gray-600); }
+
+    /* ── NEWSLETTER ARTICLE ── */
+    .nl-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      background: white;
+    }
+
+    .nl-card h3 { font-size: 1.15rem; color: var(--gray-900); margin-bottom: 0.25rem; }
+    .nl-meta { font-size: 0.8rem; color: var(--gray-400); margin-bottom: 0.75rem; }
+    .nl-card p { color: var(--gray-600); line-height: 1.7; font-size: 0.95rem; }
+
+    /* ── EVENT CARDS ── */
+    .event-card {
+      display: flex;
+      gap: 1rem;
+      padding: 1.25rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      background: white;
+      align-items: flex-start;
+    }
+
+    .event-date-box {
+      background: var(--blue);
+      color: white;
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+      text-align: center;
+      min-width: 60px;
+      flex-shrink: 0;
+    }
+
+    .event-date-box .e-month { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; opacity: 0.9; }
+    .event-date-box .e-day { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+
+    .event-info h3 { font-size: 1rem; font-weight: 600; }
+    .event-info p { font-size: 0.85rem; color: var(--gray-500); }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand" onclick="goTo('home')">
+      <div class="logo-box">SD</div>
+      <div class="brand-text">
+        <h1>Seattle Dojo</h1>
+        <p>Judo Club</p>
+      </div>
+    </div>
+    <button class="hamburger" onclick="toggleMobile()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <div class="nav-link active" data-page="home" onclick="goTo('home')">Home</div>
+      <div class="nav-link" data-page="newsletter" onclick="goTo('newsletter')">Newsletter</div>
+      <div class="nav-link" data-page="events" onclick="goTo('events')">Events</div>
+      <div class="nav-link" data-page="join" onclick="goTo('join')">Join Us</div>
+      <div class="nav-link" data-page="dues" onclick="goTo('dues')">Dues</div>
+      <div class="nav-link" data-page="donate" onclick="goTo('donate')">Donate</div>
+      <div class="nav-link" data-page="classes" onclick="goTo('classes')">Classes</div>
+      <div class="nav-link" data-page="resources" onclick="goTo('resources')">Resources</div>
+      <div class="nav-link" data-page="history" onclick="goTo('history')">History</div>
+      <div class="nav-link" data-page="swag" onclick="goTo('swag')">Swag</div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-social">
+        <a href="#" title="Facebook">f</a>
+        <a href="#" title="Instagram">📷</a>
+        <a href="#" title="YouTube">▶</a>
+      </div>
+      <button class="btn-login" onclick="goTo('admin')">Login</button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" onclick="if(event.target===this)toggleMobile()">
+    <div class="mobile-menu-content">
+      <div class="flex-between mb-3">
+        <strong>Menu</strong>
+        <button class="hamburger" onclick="toggleMobile()" style="display:block">✕</button>
+      </div>
+      <div class="nav-link" onclick="goTo('home');toggleMobile()">Home</div>
+      <div class="nav-link" onclick="goTo('newsletter');toggleMobile()">Newsletter</div>
+      <div class="nav-link" onclick="goTo('events');toggleMobile()">Events</div>
+      <div class="nav-link" onclick="goTo('join');toggleMobile()">Join Us</div>
+      <div class="nav-link" onclick="goTo('dues');toggleMobile()">Dues</div>
+      <div class="nav-link" onclick="goTo('donate');toggleMobile()">Donate</div>
+      <div class="nav-link" onclick="goTo('classes');toggleMobile()">Classes</div>
+      <div class="nav-link" onclick="goTo('resources');toggleMobile()">Resources</div>
+      <div class="nav-link" onclick="goTo('history');toggleMobile()">History</div>
+      <div class="nav-link" onclick="goTo('swag');toggleMobile()">Swag</div>
+      <div class="nav-link" onclick="goTo('admin');toggleMobile()"><strong>Login / Admin</strong></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ HOME ═══════════════ -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div>
+        <h1>Welcome to Seattle Dojo</h1>
+        <p>Building character, discipline, and strength through the art of Judo</p>
+        <div class="hero-btns">
+          <button class="btn btn-blue btn-lg" onclick="goTo('join')">Become a Member</button>
+          <button class="btn btn-white btn-lg" onclick="goTo('newsletter')">View Newsletter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2>A 501(c)(3) Non-Profit Judo Club</h2>
+        <p>Seattle Dojo is dedicated to promoting judo excellence, sportsmanship, and community engagement in the Pacific Northwest.</p>
+      </div>
+      <div class="card-grid">
+        <div class="card feature-card">
+          <div class="f-icon">📖</div>
+          <h3>Monthly Newsletter</h3>
+          <p>Stay updated with insights from our President and Head Sensei, technique lessons, and member spotlights.</p>
+        </div>
+        <div class="card feature-card">
+          <div class="f-icon">📅</div>
+          <h3>Events & Calendar</h3>
+          <p>Join us for tournaments, special training sessions, and community events throughout the year.</p>
+        </div>
+        <div class="card feature-card">
+          <div class="f-icon">👥</div>
+          <h3>Community</h3>
+          <p>Connect with fellow judoka, share experiences, and grow together in our supportive community.</p>
+        </div>
+        <div class="card feature-card">
+          <div class="f-icon">❤️</div>
+          <h3>Support Us</h3>
+          <p>Your tax-deductible donations help us maintain facilities and support youth programs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <h2>Ready to Join Seattle Dojo?</h2>
+      <p>Whether you're a beginner or experienced judoka, we welcome you to our community. Start your journey today.</p>
+      <div class="cta-btns">
+        <button class="btn btn-blue btn-lg" onclick="goTo('join')">Login to Get Started</button>
+        <button class="btn btn-outline btn-lg" onclick="goTo('dues')">Learn More About Membership</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ NEWSLETTER ═══════════════ -->
+  <div class="page" id="page-newsletter">
+    <div class="page-header">
+      <h1>Seattle Dojo Newsletter</h1>
+      <p>Stay informed with monthly updates from our President, Head Sensei, and community</p>
+    </div>
+    <div class="section" style="padding-top:0" id="newsletterContent"></div>
+  </div>
+
+  <!-- ═══════════════ EVENTS ═══════════════ -->
+  <div class="page" id="page-events">
+    <div class="page-header">
+      <h1>Events & Calendar</h1>
+      <p>Join us for tournaments, training sessions, and community events</p>
+    </div>
+    <div class="section" style="padding-top:0">
+      <h3 class="mb-2" style="font-weight:700">Upcoming Events</h3>
+      <div id="eventsContent"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ JOIN US ═══════════════ -->
+  <div class="page" id="page-join">
+    <div class="page-header">
+      <h1>Join Seattle Dojo</h1>
+      <p>Become part of our judo family</p>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="join-layout">
+        <div class="card">
+          <h3 class="mb-2" style="font-size:1.2rem">Membership Application</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input class="form-control" id="jFirstName">
+            </div>
+            <div class="form-group">
+              <label>Last Name *</label>
+              <input class="form-control" id="jLastName">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input class="form-control" type="email" id="jEmail">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input class="form-control" id="jPhone">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Membership Type</label>
+              <select class="form-control" id="jType">
+                <option value="adult">Adult Monthly ($75/mo)</option>
+                <option value="annual">Annual ($750/yr)</option>
+                <option value="youth">Youth ($50/mo)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Experience Level</label>
+              <select class="form-control" id="jExp">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Emergency Contact</label>
+            <input class="form-control" id="jEmergency" placeholder="Name — Phone number">
+          </div>
+          <button class="btn btn-blue btn-lg" style="width:100%;justify-content:center" onclick="submitApplication()">Submit Application</button>
+        </div>
+        <div>
+          <div class="info-box mb-2">
+            <h3>What You Get</h3>
+            <ul style="padding-left:1.25rem">
+              <li>Unlimited training sessions</li>
+              <li>Access to all facilities</li>
+              <li>Monthly newsletter subscription</li>
+              <li>Event participation</li>
+              <li>Community access</li>
+              <li>Belt promotion opportunities</li>
+            </ul>
+          </div>
+          <div class="info-box">
+            <h3>What to Bring</h3>
+            <ul style="padding-left:1.25rem">
+              <li>Judo gi (can be purchased at dojo)</li>
+              <li>Positive attitude</li>
+              <li>Water bottle</li>
+              <li>Completed waiver form</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DUES ═══════════════ -->
+  <div class="page" id="page-dues">
+    <div class="page-header">
+      <h1>Membership Dues</h1>
+      <p>Keep your membership active and support Seattle Dojo</p>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="p-header">
+            <div><h3>Monthly</h3><div class="p-sub">Pay as you train</div></div>
+            <div class="p-icon">📅</div>
+          </div>
+          <div class="price">$75<span>/month</span></div>
+          <ul class="p-features">
+            <li>Unlimited training sessions</li>
+            <li>Access to all facilities</li>
+            <li>Newsletter subscription</li>
+            <li>Event participation</li>
+          </ul>
+          <button class="btn btn-blue" onclick="goTo('join')">Select Monthly</button>
+        </div>
+        <div class="pricing-card featured">
+          <div class="p-header">
+            <div><h3>Annual</h3><div class="p-sub">Save 2 months</div></div>
+            <div class="p-icon">💰</div>
+          </div>
+          <div class="price">$750<span>/year</span></div>
+          <ul class="p-features">
+            <li>Everything in Monthly</li>
+            <li>Save $150 annually</li>
+            <li>Priority event registration</li>
+            <li>Free dojo t-shirt</li>
+          </ul>
+          <button class="btn btn-blue" onclick="goTo('join')">Select Annual</button>
+        </div>
+        <div class="pricing-card">
+          <div class="p-header">
+            <div><h3>Youth</h3><div class="p-sub">Under 18 years</div></div>
+            <div class="p-icon">👥</div>
+          </div>
+          <div class="price">$50<span>/month</span></div>
+          <ul class="p-features">
+            <li>Youth training sessions</li>
+            <li>Age-appropriate instruction</li>
+            <li>Character development focus</li>
+            <li>Parent involvement encouraged</li>
+          </ul>
+          <button class="btn btn-blue" onclick="goTo('join')">Select Youth</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DONATE ═══════════════ -->
+  <div class="page" id="page-donate">
+    <div class="page-header" style="text-align:center">
+      <h1>Support Seattle Dojo</h1>
+      <p>Your tax-deductible donation helps us grow and serve our community</p>
+    </div>
+    <div class="section" style="padding-top:0.5rem">
+      <div class="alert">
+        <div class="a-icon">✓</div>
+        <div>
+          <h4>Seattle Dojo is a 501(c)(3) Non-Profit Organization</h4>
+          <p>Your donation is tax-deductible to the fullest extent allowed by law. Tax ID: XX-XXXXXXX. You will receive a receipt for your records after making a donation.</p>
+        </div>
+      </div>
+      <div class="donate-grid">
+        <div class="card">
+          <h3 class="mb-1" style="font-size:1.2rem">Make a Donation</h3>
+          <p class="mb-2" style="color:var(--gray-500);font-size:0.9rem">Choose an amount or enter a custom donation</p>
+          <label style="font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;display:block">Select Amount</label>
+          <div class="amount-grid" id="amountGrid">
+            <button class="amount-btn" onclick="selectAmount(this,25)">$25</button>
+            <button class="amount-btn" onclick="selectAmount(this,50)">$50</button>
+            <button class="amount-btn selected" onclick="selectAmount(this,100)">$100</button>
+            <button class="amount-btn" onclick="selectAmount(this,250)">$250</button>
+            <button class="amount-btn" onclick="selectAmount(this,500)">$500</button>
+          </div>
+          <div class="form-group">
+            <label>Or Enter Custom Amount</label>
+            <input class="form-control" type="number" id="donateAmount" value="100" min="1" placeholder="$ 0.00">
+          </div>
+          <div class="form-group">
+            <label>Name (Optional)</label>
+            <input class="form-control" id="donateName" placeholder="Your name for recognition">
+          </div>
+          <div class="form-group">
+            <label>In Honor/Memory Of (Optional)</label>
+            <textarea class="form-control" id="donateHonor" placeholder="Dedicate this donation..." rows="3"></textarea>
+          </div>
+          <button class="btn btn-blue btn-lg" style="width:100%;justify-content:center" onclick="submitDonation()">❤️ Donate</button>
+          <p class="mt-2 text-center" style="font-size:0.8rem;color:var(--gray-400)">You will be redirected to our secure payment processor</p>
+        </div>
+        <div>
+          <div class="card mb-2">
+            <h3 class="mb-2" style="font-size:1.1rem">Your Impact</h3>
+            <p class="mb-2" style="color:var(--gray-500);font-size:0.85rem">How your donation helps Seattle Dojo</p>
+            <div class="impact-item">
+              <div class="i-icon">👥</div>
+              <div><h4>Youth Programs</h4><p>Support scholarships for young athletes who couldn't otherwise afford to train</p></div>
+            </div>
+            <div class="impact-item">
+              <div class="i-icon">🏆</div>
+              <div><h4>Competition Support</h4><p>Help cover tournament registration, travel, and equipment costs for competitors</p></div>
+            </div>
+            <div class="impact-item">
+              <div class="i-icon">🏠</div>
+              <div><h4>Facility & Equipment</h4><p>Maintain our training facility and purchase new mats, gis, and safety equipment</p></div>
+            </div>
+            <div class="impact-item">
+              <div class="i-icon">❤️</div>
+              <div><h4>Community Outreach</h4><p>Fund free demonstration events and introductory classes for the community</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="mb-2" style="font-size:1.1rem">Other Ways to Give</h3>
+            <p style="font-size:0.9rem;margin-bottom:0.5rem"><strong>Corporate Matching</strong></p>
+            <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem">Many employers match charitable donations. Check if your company participates.</p>
+            <p style="font-size:0.9rem;margin-bottom:0.5rem"><strong>Equipment Donations</strong></p>
+            <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem">We accept gently used gis, belts, and training equipment. Contact us for details.</p>
+            <p style="font-size:0.9rem;margin-bottom:0.5rem"><strong>Volunteer Time</strong></p>
+            <p style="font-size:0.85rem;color:var(--gray-500)">Your time and skills are valuable! Help with events, coaching, or administration.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CLASSES ═══════════════ -->
+  <div class="page" id="page-classes">
+    <div class="page-header">
+      <h1>Classes & Schedule</h1>
+      <p>View our current class schedule below. Our dojo offers instruction for all ages and skill levels.</p>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="schedule-layout">
+        <div class="card">
+          <h3 class="mb-1">Class Schedule</h3>
+          <p class="mb-2" style="color:var(--gray-500);font-size:0.85rem">Real-time updates to our training schedule</p>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr><th>Day</th><th>Time</th><th>Class</th><th>Level</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Sunday</td><td>10:00 AM</td><td><span class="class-dot dot-kata"></span>Kata Practice</td><td>All</td></tr>
+                <tr><td>Monday</td><td>6:30 PM</td><td><span class="class-dot dot-youth"></span>Junior Judo</td><td>Youth</td></tr>
+                <tr><td>Monday</td><td>8:00 PM</td><td><span class="class-dot dot-senior"></span>Senior Class</td><td>Adult</td></tr>
+                <tr><td>Tuesday</td><td>8:00 PM</td><td><span class="class-dot dot-senior"></span>Senior Beginners</td><td>Beginner</td></tr>
+                <tr><td>Wednesday</td><td>8:00 PM</td><td><span class="class-dot dot-senior"></span>Senior Randori</td><td>Adult</td></tr>
+                <tr><td>Thursday</td><td>6:30 PM</td><td><span class="class-dot dot-youth"></span>Junior Judo</td><td>Youth</td></tr>
+                <tr><td>Thursday</td><td>8:00 PM</td><td><span class="class-dot dot-senior"></span>Senior Class</td><td>Adult</td></tr>
+                <tr><td>Saturday</td><td>10:00 AM</td><td><span class="class-dot dot-comp"></span>Competition Training</td><td>Advanced</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="flex gap-2 mt-2" style="flex-wrap:wrap">
+            <span style="font-size:0.8rem"><span class="class-dot dot-youth"></span> Youth</span>
+            <span style="font-size:0.8rem"><span class="class-dot dot-senior"></span> Senior/Adult</span>
+            <span style="font-size:0.8rem"><span class="class-dot dot-comp"></span> Competition</span>
+            <span style="font-size:0.8rem"><span class="class-dot dot-kata"></span> Kata</span>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3 class="mb-2">What We Offer</h3>
+            <div class="mb-2"><h4 style="font-size:0.95rem">Youth Classes</h4><p style="font-size:0.85rem;color:var(--gray-500)">Ages 5-12 fundamental judo instruction</p></div>
+            <div class="mb-2"><h4 style="font-size:0.95rem">Teen Programs</h4><p style="font-size:0.85rem;color:var(--gray-500)">Ages 13-17 competitive training</p></div>
+            <div class="mb-2"><h4 style="font-size:0.95rem">Adult Classes</h4><p style="font-size:0.85rem;color:var(--gray-500)">All ages welcome for fitness & technique</p></div>
+            <div class="mb-2"><h4 style="font-size:0.95rem">Belt Ranking</h4><p style="font-size:0.85rem;color:var(--gray-500)">Regular promotion opportunities</p></div>
+            <div><h4 style="font-size:0.95rem">Competitions</h4><p style="font-size:0.85rem;color:var(--gray-500)">Local and regional tournament participation</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ RESOURCES ═══════════════ -->
+  <div class="page" id="page-resources">
+    <div class="page-header">
+      <h1>Resources</h1>
+      <p>Important links and resources for our judo community.</p>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="resource-card">
+        <div><h3>USJA - USA Judo</h3><p>National judo organization and ruleset</p></div>
+        <a href="https://www.usja.net" target="_blank" class="btn btn-outline btn-sm">↗ Visit</a>
+      </div>
+      <div class="resource-card">
+        <div><h3>IJF - International Judo Federation</h3><p>World judo governing body</p></div>
+        <a href="https://www.ijf.org" target="_blank" class="btn btn-outline btn-sm">↗ Visit</a>
+      </div>
+      <div class="resource-card">
+        <div><h3>Washington Judo Association</h3><p>Regional judo association</p></div>
+        <a href="#" class="btn btn-outline btn-sm">↗ Visit</a>
+      </div>
+      <div class="resource-card">
+        <div><h3>Judo Information Site</h3><p>Learn about judo history and techniques</p></div>
+        <a href="https://judoinfo.com" target="_blank" class="btn btn-outline btn-sm">↗ Visit</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ HISTORY ═══════════════ -->
+  <div class="page" id="page-history">
+    <div class="page-header">
+      <h1>Seattle Dojo History & Archives</h1>
+      <p>Explore our club's rich history through photos and articles</p>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="tabs">
+        <button class="tab active" onclick="filterHistory('all',this)">All</button>
+        <button class="tab" onclick="filterHistory('articles',this)">Articles</button>
+        <button class="tab" onclick="filterHistory('pictures',this)">Pictures</button>
+      </div>
+      <div id="historyContent">
+        <div class="empty-state">
+          <div class="e-icon">📚</div>
+          <h3>No history items yet</h3>
+          <p>Check back soon as we build our digital archive!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SWAG ═══════════════ -->
+  <div class="page" id="page-swag">
+    <div class="page-header">
+      <h1>Dojo Swag Shop</h1>
+      <p>Rep Seattle Dojo with official merchandise</p>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="swag-grid">
+        <div class="swag-card">
+          <div class="swag-img">👕</div>
+          <div class="swag-info">
+            <h3>Seattle Dojo T-Shirt</h3>
+            <div class="s-price">$25</div>
+            <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem">Cotton blend, available in S-XXL. Navy blue with white SD logo.</p>
+            <button class="btn btn-blue btn-sm" style="width:100%;justify-content:center">Add to Cart</button>
+          </div>
+        </div>
+        <div class="swag-card">
+          <div class="swag-img">🎒</div>
+          <div class="swag-info">
+            <h3>Dojo Gear Bag</h3>
+            <div class="s-price">$40</div>
+            <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem">Durable drawstring bag, fits gi + gear. Embroidered logo.</p>
+            <button class="btn btn-blue btn-sm" style="width:100%;justify-content:center">Add to Cart</button>
+          </div>
+        </div>
+        <div class="swag-card">
+          <div class="swag-img">🧢</div>
+          <div class="swag-info">
+            <h3>Seattle Dojo Cap</h3>
+            <div class="s-price">$20</div>
+            <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem">Adjustable baseball cap with embroidered SD logo.</p>
+            <button class="btn btn-blue btn-sm" style="width:100%;justify-content:center">Add to Cart</button>
+          </div>
+        </div>
+        <div class="swag-card">
+          <div class="swag-img">🥋</div>
+          <div class="swag-info">
+            <h3>Club Patch</h3>
+            <div class="s-price">$10</div>
+            <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem">Iron-on patch for your gi. Official Seattle Dojo emblem.</p>
+            <button class="btn btn-blue btn-sm" style="width:100%;justify-content:center">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ADMIN PANEL ═══════════════ -->
+  <div class="page" id="page-admin">
+    <div class="admin-topbar">
+      <span>🥋 <strong>Seattle Dojo</strong> — Admin Panel</span>
+      <div class="flex gap-1">
+        <button class="btn btn-sm" style="background:var(--gray-700);color:white" onclick="exportData()">📥 Export</button>
+        <button class="btn btn-sm" style="background:var(--gray-700);color:white" onclick="document.getElementById('importFile').click()">📤 Import</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,0.1);color:white" onclick="goTo('home')">← Back to Site</button>
+      </div>
+    </div>
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="switchAdmin('dashboard')">📊 Dashboard</div>
+      <div class="admin-tab" onclick="switchAdmin('members')">👥 Members</div>
+      <div class="admin-tab" onclick="switchAdmin('payments')">💰 Payments</div>
+      <div class="admin-tab" onclick="switchAdmin('articles')">📰 Newsletter</div>
+      <div class="admin-tab" onclick="switchAdmin('eventsMgr')">📅 Events</div>
+    </div>
+
+    <!-- Admin: Dashboard -->
+    <div class="admin-content admin-panel active" id="admin-dashboard">
+      <div class="stats-grid" id="adminStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div class="card">
+          <h3 class="mb-2">Recent Activity</h3>
+          <div id="adminActivity"></div>
+        </div>
+        <div class="card">
+          <h3 class="mb-2">Upcoming Events</h3>
+          <div id="adminEvents"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin: Members -->
+    <div class="admin-content admin-panel" id="admin-members" style="display:none">
+      <div class="flex-between mb-2">
+        <div class="search-bar">
+          <input type="text" id="memberSearch" placeholder="Search members..." oninput="renderMembers()">
+        </div>
+        <div class="flex gap-1">
+          <select class="form-control" id="memberFilter" style="width:auto" onchange="renderMembers()">
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <button class="btn btn-blue" onclick="openMemberModal()">+ Add Member</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap" style="border:none">
+          <table>
+            <thead><tr><th>Name</th><th>Belt</th><th>Email</th><th>Phone</th><th>Type</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="membersTable"></tbody>
+          </table>
+        </div>
+        <div id="membersEmpty" class="empty-state" style="display:none">
+          <div class="e-icon">👥</div><h3>No members yet</h3><p>Click "Add Member" to get started.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin: Payments -->
+    <div class="admin-content admin-panel" id="admin-payments" style="display:none">
+      <div class="stats-grid" id="paymentStats"></div>
+      <div class="flex-between mb-2">
+        <div class="search-bar">
+          <input type="text" id="paymentSearch" placeholder="Search payments..." oninput="renderPayments()">
+        </div>
+        <button class="btn btn-green" onclick="openPaymentModal()">+ Record Payment</button>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap" style="border:none">
+          <table>
+            <thead><tr><th>Date</th><th>Member</th><th>Type</th><th>Amount</th><th>Method</th><th>Notes</th><th>Actions</th></tr></thead>
+            <tbody id="paymentsTable"></tbody>
+          </table>
+        </div>
+        <div id="paymentsEmpty" class="empty-state" style="display:none">
+          <div class="e-icon">💰</div><h3>No payments recorded</h3><p>Click "Record Payment" to start tracking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin: Newsletter -->
+    <div class="admin-content admin-panel" id="admin-articles" style="display:none">
+      <div class="flex-between mb-2">
+        <h3>Manage Newsletter Articles</h3>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div class="card">
+          <h3 class="mb-2" style="font-size:1.05rem" id="articleFormTitle">Add Article</h3>
+          <input type="hidden" id="editArticleId" value="">
+          <div class="form-group"><label>Title</label><input class="form-control" id="articleTitle"></div>
+          <div class="form-group"><label>Author</label><input class="form-control" id="articleAuthor"></div>
+          <div class="form-group"><label>Content</label><textarea class="form-control" id="articleContent" rows="8"></textarea></div>
+          <div class="flex gap-1">
+            <button class="btn btn-blue" onclick="saveArticle()">Save Article</button>
+            <button class="btn btn-ghost" onclick="clearArticleForm()">Clear</button>
+          </div>
+        </div>
+        <div>
+          <div class="card"><h3 class="mb-2" style="font-size:1.05rem">All Articles</h3><div id="articlesList"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin: Events -->
+    <div class="admin-content admin-panel" id="admin-eventsMgr" style="display:none">
+      <div class="flex-between mb-2">
+        <h3>Manage Events</h3>
+        <button class="btn btn-blue" onclick="openEventModal()">+ Add Event</button>
+      </div>
+      <div id="adminEventsList"></div>
+    </div>
+  </div>
+
+  <!-- ═══ MEMBER MODAL ═══ -->
+  <div class="modal-overlay" id="memberModal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="memberModalTitle">Add Member</h3><button class="modal-close" onclick="closeModal('memberModal')">&times;</button></div>
+      <div class="modal-body">
+        <input type="hidden" id="editMemberId" value="">
+        <div class="form-row"><div class="form-group"><label>First Name *</label><input class="form-control" id="mFirst"></div><div class="form-group"><label>Last Name *</label><input class="form-control" id="mLast"></div></div>
+        <div class="form-row"><div class="form-group"><label>Email</label><input class="form-control" id="mEmail"></div><div class="form-group"><label>Phone</label><input class="form-control" id="mPhone"></div></div>
+        <div class="form-row">
+          <div class="form-group"><label>Belt</label><select class="form-control" id="mBelt"><option value="white">White</option><option value="yellow">Yellow</option><option value="orange">Orange</option><option value="green">Green</option><option value="blue">Blue</option><option value="purple">Purple</option><option value="brown">Brown</option><option value="black">Black</option></select></div>
+          <div class="form-group"><label>Membership</label><select class="form-control" id="mType"><option value="adult">Adult Monthly</option><option value="youth">Youth</option><option value="annual">Annual</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Status</label><select class="form-control" id="mStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+          <div class="form-group"><label>Join Date</label><input class="form-control" type="date" id="mDate"></div>
+        </div>
+        <div class="form-group"><label>Emergency Contact</label><input class="form-control" id="mEmergency" placeholder="Name — Phone"></div>
+        <div class="form-group"><label>Notes</label><textarea class="form-control" id="mNotes" rows="2"></textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('memberModal')">Cancel</button><button class="btn btn-blue" onclick="saveMember()">Save</button></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAYMENT MODAL ═══ -->
+  <div class="modal-overlay" id="paymentModal">
+    <div class="modal">
+      <div class="modal-header"><h3>Record Payment</h3><button class="modal-close" onclick="closeModal('paymentModal')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Member *</label><select class="form-control" id="pMember"></select></div>
+        <div class="form-row"><div class="form-group"><label>Amount ($) *</label><input class="form-control" type="number" id="pAmount" step="0.01" min="0"></div><div class="form-group"><label>Date</label><input class="form-control" type="date" id="pDate"></div></div>
+        <div class="form-row"><div class="form-group"><label>Type</label><select class="form-control" id="pType"><option value="dues">Monthly Dues</option><option value="annual">Annual</option><option value="event">Event Fee</option><option value="other">Other</option></select></div><div class="form-group"><label>Method</label><select class="form-control" id="pMethod"><option value="cash">Cash</option><option value="check">Check</option><option value="card">Card</option><option value="online">Online/Venmo/Zelle</option></select></div></div>
+        <div class="form-group"><label>Notes</label><input class="form-control" id="pNotes"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('paymentModal')">Cancel</button><button class="btn btn-green" onclick="savePayment()">Record Payment</button></div>
+    </div>
+  </div>
+
+  <!-- ═══ EVENT MODAL ═══ -->
+  <div class="modal-overlay" id="eventModal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="eventModalTitle">Add Event</h3><button class="modal-close" onclick="closeModal('eventModal')">&times;</button></div>
+      <div class="modal-body">
+        <input type="hidden" id="editEventId" value="">
+        <div class="form-group"><label>Event Name *</label><input class="form-control" id="eName"></div>
+        <div class="form-row"><div class="form-group"><label>Date *</label><input class="form-control" type="date" id="eDate"></div><div class="form-group"><label>Time</label><input class="form-control" type="time" id="eTime"></div></div>
+        <div class="form-group"><label>Location</label><input class="form-control" id="eLocation"></div>
+        <div class="form-group"><label>Description</label><textarea class="form-control" id="eDesc" rows="3"></textarea></div>
+        <div class="form-group"><label>Type</label><select class="form-control" id="eType"><option value="practice">Practice</option><option value="tournament">Tournament</option><option value="seminar">Seminar</option><option value="social">Social</option><option value="promotion">Promotion</option><option value="other">Other</option></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('eventModal')">Cancel</button><button class="btn btn-blue" onclick="saveEvent()">Save Event</button></div>
+    </div>
+  </div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const KEY = 'seattleDojoData';
+
+function defaults() {
+  return { members: [], payments: [], articles: [], events: [], activities: [] };
+}
+
+function load() {
+  try { const d = localStorage.getItem(KEY); return d ? { ...defaults(), ...JSON.parse(d) } : defaults(); }
+  catch { return defaults(); }
+}
+
+function save() { localStorage.setItem(KEY, JSON.stringify(D)); }
+
+let D = load();
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+function log(t) { D.activities.unshift({ text: t, time: new Date().toISOString() }); if (D.activities.length > 50) D.activities.length = 50; save(); }
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function fmtDate(d) { if (!d) return ''; try { return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch { return d; } }
+function timeAgo(d) { const s = Math.floor((Date.now() - new Date(d)) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return Math.floor(s / 60) + 'm ago'; if (s < 86400) return Math.floor(s / 3600) + 'h ago'; return Math.floor(s / 86400) + 'd ago'; }
+
+function toast(msg, type = '') {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+
+  document.querySelectorAll('#navLinks .nav-link').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+
+  // Hide/show navbar for admin
+  document.getElementById('navbar').style.display = page === 'admin' ? 'none' : '';
+
+  window.scrollTo(0, 0);
+
+  // Render dynamic content
+  if (page === 'newsletter') renderNewsletter();
+  if (page === 'events') renderPublicEvents();
+  if (page === 'admin') { renderAdminDashboard(); renderMembers(); renderPayments(); renderArticlesList(); renderAdminEvents(); }
+}
+
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('show');
+}
+
+// ═══════════════════════════════════════
+// ADMIN TABS
+// ═══════════════════════════════════════
+function switchAdmin(panel) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('admin-' + panel);
+  if (el) el.style.display = 'block';
+  event.target.classList.add('active');
+
+  if (panel === 'dashboard') renderAdminDashboard();
+  if (panel === 'members') renderMembers();
+  if (panel === 'payments') renderPayments();
+  if (panel === 'articles') renderArticlesList();
+  if (panel === 'eventsMgr') renderAdminEvents();
+}
+
+// ═══════════════════════════════════════
+// PUBLIC PAGES
+// ═══════════════════════════════════════
+function renderNewsletter() {
+  const el = document.getElementById('newsletterContent');
+  if (D.articles.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="e-icon">📰</div><h3>No Newsletters Yet</h3><p>Check back soon for our first newsletter edition!</p></div>';
+    return;
+  }
+  el.innerHTML = D.articles.map(a => `
+    <div class="nl-card">
+      <h3>${esc(a.title)}</h3>
+      <div class="nl-meta">${a.author ? 'By ' + esc(a.author) + ' · ' : ''}${fmtDate(a.date)}</div>
+      <p>${esc(a.content).replace(/\n/g, '<br>')}</p>
+    </div>
+  `).join('');
+}
+
+function renderPublicEvents() {
+  const now = new Date(new Date().toDateString());
+  const upcoming = D.events.filter(e => new Date(e.date) >= now).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const el = document.getElementById('eventsContent');
+
+  if (upcoming.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="e-icon">📅</div><h3>No Upcoming Events</h3><p>Check back soon for new events and training sessions!</p></div>';
+    return;
+  }
+
+  el.innerHTML = upcoming.map(e => {
+    const d = new Date(e.date + 'T00:00:00');
+    return `
+      <div class="event-card">
+        <div class="event-date-box">
+          <div class="e-month">${d.toLocaleString('default', { month: 'short' })}</div>
+          <div class="e-day">${d.getDate()}</div>
+        </div>
+        <div class="event-info">
+          <h3>${esc(e.name)}</h3>
+          <p>${e.time ? e.time + ' · ' : ''}${esc(e.location || '')}</p>
+          ${e.description ? '<p style="margin-top:0.35rem;color:var(--gray-600)">' + esc(e.description) + '</p>' : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterHistory(type, btn) {
+  document.querySelectorAll('#page-history .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  // Placeholder - history items would come from data
+}
+
+function selectAmount(btn, val) {
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('donateAmount').value = val;
+}
+
+function submitApplication() {
+  const f = document.getElementById('jFirstName').value.trim();
+  const l = document.getElementById('jLastName').value.trim();
+  const e = document.getElementById('jEmail').value.trim();
+  if (!f || !l || !e) { toast('Please fill in required fields', 'error'); return; }
+
+  D.members.push({
+    id: uid(), firstName: f, lastName: l, email: e,
+    phone: document.getElementById('jPhone').value.trim(),
+    belt: 'white', membershipType: document.getElementById('jType').value,
+    status: 'active', joinDate: new Date().toISOString().slice(0, 10),
+    emergency: document.getElementById('jEmergency').value.trim(), notes: 'Joined via website'
+  });
+  log('New member application: ' + f + ' ' + l);
+  save();
+  toast('Application submitted! Welcome to Seattle Dojo!', 'success');
+  ['jFirstName', 'jLastName', 'jEmail', 'jPhone', 'jEmergency'].forEach(id => document.getElementById(id).value = '');
+}
+
+function submitDonation() {
+  const amount = document.getElementById('donateAmount').value;
+  if (!amount || Number(amount) <= 0) { toast('Please enter a valid amount', 'error'); return; }
+  const name = document.getElementById('donateName').value.trim() || 'Anonymous';
+  D.payments.push({
+    id: uid(), memberId: '', memberName: name,
+    amount: Number(amount), date: new Date().toISOString().slice(0, 10),
+    type: 'other', method: 'online', notes: 'Donation' + (document.getElementById('donateHonor').value.trim() ? ' — ' + document.getElementById('donateHonor').value.trim() : '')
+  });
+  log('Donation: $' + amount + ' from ' + name);
+  save();
+  toast('Thank you for your generous donation of $' + amount + '!', 'success');
+}
+
+// ═══════════════════════════════════════
+// ADMIN: DASHBOARD
+// ═══════════════════════════════════════
+function renderAdminDashboard() {
+  const active = D.members.filter(m => m.status === 'active').length;
+  const now = new Date();
+  const monthRev = D.payments.filter(p => { const d = new Date(p.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }).reduce((s, p) => s + Number(p.amount), 0);
+  const upEv = D.events.filter(e => new Date(e.date) >= new Date(now.toDateString())).length;
+
+  document.getElementById('adminStats').innerHTML = `
+    <div class="stat-card"><div class="s-value">${active}</div><div class="s-label">Active Members (${D.members.length} total)</div></div>
+    <div class="stat-card accent"><div class="s-value">$${monthRev.toLocaleString()}</div><div class="s-label">Revenue This Month</div></div>
+    <div class="stat-card warn"><div class="s-value">${upEv}</div><div class="s-label">Upcoming Events</div></div>
+    <div class="stat-card"><div class="s-value">${D.articles.length}</div><div class="s-label">Newsletter Articles</div></div>
+  `;
+
+  document.getElementById('adminActivity').innerHTML = D.activities.length === 0
+    ? '<p style="color:var(--gray-400);font-size:0.9rem">No recent activity</p>'
+    : D.activities.slice(0, 8).map(a => `<div style="padding:0.4rem 0;border-bottom:1px solid var(--gray-100);font-size:0.85rem"><span>${esc(a.text)}</span><br><span style="color:var(--gray-400);font-size:0.75rem">${timeAgo(a.time)}</span></div>`).join('');
+
+  const upcomingEvts = D.events.filter(e => new Date(e.date) >= new Date(now.toDateString())).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 5);
+  document.getElementById('adminEvents').innerHTML = upcomingEvts.length === 0
+    ? '<p style="color:var(--gray-400);font-size:0.9rem">No upcoming events</p>'
+    : upcomingEvts.map(e => `<div style="padding:0.4rem 0;border-bottom:1px solid var(--gray-100);font-size:0.85rem"><strong>${esc(e.name)}</strong><br><span style="color:var(--gray-400);font-size:0.75rem">${fmtDate(e.date)}${e.time ? ' at ' + e.time : ''}</span></div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// ADMIN: MEMBERS
+// ═══════════════════════════════════════
+function openMemberModal(id) {
+  document.getElementById('editMemberId').value = '';
+  document.getElementById('memberModalTitle').textContent = 'Add Member';
+  ['mFirst','mLast','mEmail','mPhone','mEmergency','mNotes'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('mBelt').value = 'white';
+  document.getElementById('mType').value = 'adult';
+  document.getElementById('mStatus').value = 'active';
+  document.getElementById('mDate').value = new Date().toISOString().slice(0, 10);
+
+  if (id) {
+    const m = D.members.find(x => x.id === id);
+    if (m) {
+      document.getElementById('editMemberId').value = m.id;
+      document.getElementById('memberModalTitle').textContent = 'Edit Member';
+      document.getElementById('mFirst').value = m.firstName || '';
+      document.getElementById('mLast').value = m.lastName || '';
+      document.getElementById('mEmail').value = m.email || '';
+      document.getElementById('mPhone').value = m.phone || '';
+      document.getElementById('mBelt').value = m.belt || 'white';
+      document.getElementById('mType').value = m.membershipType || 'adult';
+      document.getElementById('mStatus').value = m.status || 'active';
+      document.getElementById('mDate').value = m.joinDate || '';
+      document.getElementById('mEmergency').value = m.emergency || '';
+      document.getElementById('mNotes').value = m.notes || '';
+    }
+  }
+  openModal('memberModal');
+}
+
+function saveMember() {
+  const fn = document.getElementById('mFirst').value.trim();
+  const ln = document.getElementById('mLast').value.trim();
+  if (!fn || !ln) { toast('Name required', 'error'); return; }
+  const eid = document.getElementById('editMemberId').value;
+  const m = { id: eid || uid(), firstName: fn, lastName: ln, email: document.getElementById('mEmail').value.trim(), phone: document.getElementById('mPhone').value.trim(), belt: document.getElementById('mBelt').value, membershipType: document.getElementById('mType').value, status: document.getElementById('mStatus').value, joinDate: document.getElementById('mDate').value, emergency: document.getElementById('mEmergency').value.trim(), notes: document.getElementById('mNotes').value.trim() };
+  if (eid) { const i = D.members.findIndex(x => x.id === eid); if (i >= 0) D.members[i] = m; log('Updated: ' + fn + ' ' + ln); }
+  else { D.members.push(m); log('Added member: ' + fn + ' ' + ln); }
+  save(); closeModal('memberModal'); renderMembers(); toast(eid ? 'Updated!' : 'Member added!', 'success');
+}
+
+function deleteMember(id) {
+  const m = D.members.find(x => x.id === id);
+  if (!m || !confirm('Remove ' + m.firstName + ' ' + m.lastName + '?')) return;
+  D.members = D.members.filter(x => x.id !== id); log('Removed: ' + m.firstName + ' ' + m.lastName); save(); renderMembers(); toast('Removed');
+}
+
+function renderMembers() {
+  const q = document.getElementById('memberSearch').value.toLowerCase();
+  const f = document.getElementById('memberFilter').value;
+  let list = D.members;
+  if (f !== 'all') list = list.filter(m => m.status === f);
+  if (q) list = list.filter(m => (m.firstName + ' ' + m.lastName + ' ' + m.email).toLowerCase().includes(q));
+
+  const tb = document.getElementById('membersTable');
+  const em = document.getElementById('membersEmpty');
+  if (list.length === 0) { tb.innerHTML = ''; em.style.display = ''; return; }
+  em.style.display = 'none';
+
+  tb.innerHTML = list.map(m => `<tr>
+    <td><strong>${esc(m.firstName)} ${esc(m.lastName)}</strong></td>
+    <td><span class="belt"><span class="belt-dot belt-${m.belt}"></span>${cap(m.belt)}</span></td>
+    <td>${esc(m.email || '—')}</td><td>${esc(m.phone || '—')}</td>
+    <td>${cap(m.membershipType || 'adult')}</td>
+    <td><span class="badge badge-${m.status === 'active' ? 'green' : 'red'}">${cap(m.status)}</span></td>
+    <td>${fmtDate(m.joinDate)}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="openMemberModal('${m.id}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="deleteMember('${m.id}')">🗑️</button></td>
+  </tr>`).join('');
+}
+
+// ═══════════════════════════════════════
+// ADMIN: PAYMENTS
+// ═══════════════════════════════════════
+function openPaymentModal() {
+  const sel = document.getElementById('pMember');
+  sel.innerHTML = '<option value="">Select member...</option>' + D.members.map(m => `<option value="${m.id}">${esc(m.firstName)} ${esc(m.lastName)}</option>`).join('');
+  document.getElementById('pAmount').value = '';
+  document.getElementById('pDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('pType').value = 'dues'; document.getElementById('pMethod').value = 'cash'; document.getElementById('pNotes').value = '';
+  openModal('paymentModal');
+}
+
+function savePayment() {
+  const mid = document.getElementById('pMember').value;
+  const amt = document.getElementById('pAmount').value;
+  if (!mid) { toast('Select a member', 'error'); return; }
+  if (!amt || Number(amt) <= 0) { toast('Enter valid amount', 'error'); return; }
+  const mem = D.members.find(m => m.id === mid);
+  D.payments.push({ id: uid(), memberId: mid, memberName: mem ? mem.firstName + ' ' + mem.lastName : 'Unknown', amount: Number(amt), date: document.getElementById('pDate').value, type: document.getElementById('pType').value, method: document.getElementById('pMethod').value, notes: document.getElementById('pNotes').value.trim() });
+  log('Payment: $' + amt + ' from ' + (mem ? mem.firstName + ' ' + mem.lastName : 'Unknown'));
+  save(); closeModal('paymentModal'); renderPayments(); toast('Payment recorded!', 'success');
+}
+
+function deletePayment(id) { if (!confirm('Delete this payment?')) return; D.payments = D.payments.filter(p => p.id !== id); save(); renderPayments(); }
+
+function renderPayments() {
+  const q = document.getElementById('paymentSearch').value.toLowerCase();
+  let list = D.payments.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (q) list = list.filter(p => (p.memberName + ' ' + p.notes).toLowerCase().includes(q));
+
+  const total = D.payments.reduce((s, p) => s + Number(p.amount), 0);
+  const now = new Date();
+  const monthT = D.payments.filter(p => { const d = new Date(p.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }).reduce((s, p) => s + Number(p.amount), 0);
+
+  document.getElementById('paymentStats').innerHTML = `
+    <div class="stat-card accent"><div class="s-value">$${total.toLocaleString()}</div><div class="s-label">Total Revenue</div></div>
+    <div class="stat-card"><div class="s-value">$${monthT.toLocaleString()}</div><div class="s-label">This Month</div></div>
+    <div class="stat-card warn"><div class="s-value">${D.payments.length}</div><div class="s-label">Total Transactions</div></div>
+  `;
+
+  const tb = document.getElementById('paymentsTable');
+  const em = document.getElementById('paymentsEmpty');
+  if (list.length === 0) { tb.innerHTML = ''; em.style.display = ''; return; }
+  em.style.display = 'none';
+  const labels = { dues: 'Monthly Dues', annual: 'Annual', event: 'Event Fee', other: 'Other' };
+  tb.innerHTML = list.map(p => `<tr><td>${fmtDate(p.date)}</td><td><strong>${esc(p.memberName)}</strong></td><td>${labels[p.type] || p.type}</td><td><strong>$${Number(p.amount).toFixed(2)}</strong></td><td>${cap(p.method)}</td><td>${esc(p.notes || '—')}</td><td><button class="btn btn-ghost btn-sm" onclick="deletePayment('${p.id}')">🗑️</button></td></tr>`).join('');
+}
+
+// ═══════════════════════════════════════
+// ADMIN: NEWSLETTER
+// ═══════════════════════════════════════
+function saveArticle() {
+  const title = document.getElementById('articleTitle').value.trim();
+  const content = document.getElementById('articleContent').value.trim();
+  if (!title || !content) { toast('Title and content required', 'error'); return; }
+  const eid = document.getElementById('editArticleId').value;
+  const a = { id: eid || uid(), title, author: document.getElementById('articleAuthor').value.trim(), content, date: new Date().toISOString().slice(0, 10) };
+  if (eid) { const i = D.articles.findIndex(x => x.id === eid); if (i >= 0) D.articles[i] = a; log('Updated article: ' + title); }
+  else { D.articles.push(a); log('Added article: ' + title); }
+  save(); clearArticleForm(); renderArticlesList(); toast(eid ? 'Updated!' : 'Article saved!', 'success');
+}
+
+function clearArticleForm() {
+  document.getElementById('editArticleId').value = '';
+  document.getElementById('articleFormTitle').textContent = 'Add Article';
+  ['articleTitle', 'articleAuthor', 'articleContent'].forEach(id => document.getElementById(id).value = '');
+}
+
+function editArticle(id) {
+  const a = D.articles.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('editArticleId').value = a.id;
+  document.getElementById('articleFormTitle').textContent = 'Edit Article';
+  document.getElementById('articleTitle').value = a.title;
+  document.getElementById('articleAuthor').value = a.author || '';
+  document.getElementById('articleContent').value = a.content;
+}
+
+function deleteArticle(id) {
+  if (!confirm('Delete this article?')) return;
+  D.articles = D.articles.filter(x => x.id !== id); save(); renderArticlesList(); toast('Deleted');
+}
+
+function renderArticlesList() {
+  const el = document.getElementById('articlesList');
+  if (D.articles.length === 0) { el.innerHTML = '<p style="color:var(--gray-400);font-size:0.9rem">No articles yet</p>'; return; }
+  el.innerHTML = D.articles.map(a => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--gray-100)">
+      <div><strong style="font-size:0.9rem">${esc(a.title)}</strong><br><span style="font-size:0.75rem;color:var(--gray-400)">${a.author ? 'By ' + esc(a.author) + ' · ' : ''}${fmtDate(a.date)}</span></div>
+      <div class="flex gap-1"><button class="btn btn-ghost btn-sm" onclick="editArticle('${a.id}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="deleteArticle('${a.id}')">🗑️</button></div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// ADMIN: EVENTS
+// ═══════════════════════════════════════
+function openEventModal(id) {
+  document.getElementById('editEventId').value = '';
+  document.getElementById('eventModalTitle').textContent = 'Add Event';
+  ['eName', 'eDate', 'eTime', 'eLocation', 'eDesc'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('eType').value = 'practice';
+  if (id) {
+    const e = D.events.find(x => x.id === id);
+    if (e) {
+      document.getElementById('editEventId').value = e.id;
+      document.getElementById('eventModalTitle').textContent = 'Edit Event';
+      document.getElementById('eName').value = e.name || '';
+      document.getElementById('eDate').value = e.date || '';
+      document.getElementById('eTime').value = e.time || '';
+      document.getElementById('eLocation').value = e.location || '';
+      document.getElementById('eDesc').value = e.description || '';
+      document.getElementById('eType').value = e.type || 'practice';
+    }
+  }
+  openModal('eventModal');
+}
+
+function saveEvent() {
+  const name = document.getElementById('eName').value.trim();
+  const date = document.getElementById('eDate').value;
+  if (!name || !date) { toast('Name and date required', 'error'); return; }
+  const eid = document.getElementById('editEventId').value;
+  const e = { id: eid || uid(), name, date, time: document.getElementById('eTime').value, location: document.getElementById('eLocation').value.trim(), description: document.getElementById('eDesc').value.trim(), type: document.getElementById('eType').value };
+  if (eid) { const i = D.events.findIndex(x => x.id === eid); if (i >= 0) D.events[i] = e; log('Updated event: ' + name); }
+  else { D.events.push(e); log('Added event: ' + name); }
+  save(); closeModal('eventModal'); renderAdminEvents(); toast(eid ? 'Updated!' : 'Event added!', 'success');
+}
+
+function deleteEvent(id) {
+  const e = D.events.find(x => x.id === id);
+  if (!e || !confirm('Delete "' + e.name + '"?')) return;
+  D.events = D.events.filter(x => x.id !== id); save(); renderAdminEvents(); toast('Deleted');
+}
+
+function renderAdminEvents() {
+  const sorted = D.events.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+  const el = document.getElementById('adminEventsList');
+  if (sorted.length === 0) { el.innerHTML = '<div class="empty-state"><div class="e-icon">📅</div><h3>No events</h3><p>Click "Add Event" to create one.</p></div>'; return; }
+  const icons = { practice: '🥋', tournament: '🏆', seminar: '📚', social: '🎉', promotion: '🎖️', other: '📌' };
+  el.innerHTML = sorted.map(e => `
+    <div class="card mb-1" style="padding:1rem">
+      <div class="flex-between">
+        <div class="flex gap-1" style="align-items:center">
+          <span style="font-size:1.3rem">${icons[e.type] || '📌'}</span>
+          <div><strong>${esc(e.name)}</strong><br><span style="font-size:0.8rem;color:var(--gray-400)">${fmtDate(e.date)}${e.time ? ' at ' + e.time : ''}${e.location ? ' — ' + esc(e.location) : ''}</span></div>
+        </div>
+        <div class="flex gap-1"><button class="btn btn-ghost btn-sm" onclick="openEventModal('${e.id}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="deleteEvent('${e.id}')">🗑️</button></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// DATA IMPORT / EXPORT
+// ═══════════════════════════════════════
+function exportData() {
+  const blob = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'seattle-dojo-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click(); URL.revokeObjectURL(a.href); toast('Exported!', 'success');
+}
+
+function importData(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imp = JSON.parse(e.target.result);
+      if (!confirm('Replace all data?')) return;
+      D = { ...defaults(), ...imp }; save(); goTo('admin'); toast('Imported!', 'success');
+    } catch { toast('Invalid file', 'error'); }
+  };
+  reader.readAsText(file); event.target.value = '';
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show')); });
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); }));
+</script>
+</body>
+</html>
