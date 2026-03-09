@@ -1646,7 +1646,33 @@ function closeModal(id) { document.getElementById(id).classList.remove('show'); 
 // ═══════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════
+const ADMIN_HASH = '631ddcda'; // hashed password
+let adminUnlocked = false;
+
+function hashPass(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
+  return (h >>> 0).toString(16);
+}
+
+function checkAdminAccess() {
+  if (adminUnlocked) return true;
+  const saved = sessionStorage.getItem('sdAdminAuth');
+  if (saved === ADMIN_HASH) { adminUnlocked = true; return true; }
+  const pw = prompt('🔒 Enter admin password:');
+  if (!pw) return false;
+  if (hashPass(pw) === ADMIN_HASH) {
+    adminUnlocked = true;
+    sessionStorage.setItem('sdAdminAuth', ADMIN_HASH);
+    return true;
+  }
+  alert('Incorrect password.');
+  return false;
+}
+
 function goTo(page) {
+  if (page === 'admin' && !checkAdminAccess()) return;
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const el = document.getElementById('page-' + page);
   if (el) el.classList.add('active');
